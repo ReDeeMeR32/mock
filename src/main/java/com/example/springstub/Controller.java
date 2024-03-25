@@ -1,9 +1,9 @@
 package com.example.springstub;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.apache.coyote.BadRequestException;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -11,16 +11,17 @@ import java.util.Map;
 @RestController
 public class Controller {
     @GetMapping("/api/get")
-    public String getData() {
-        return "{\"message\": \"Nothing here\"}";
+    public ResponseEntity<?> getData() {
+        return ResponseEntity.ok(new User("jojo", "bean"));
     }
 
     @PostMapping("/api/post")
-    public Map<String, Object> login(@RequestBody Map<String, String> credentials) {
-        Map<String, Object> response = new HashMap<>();
-        response.put("login", credentials.get("login"));
-        response.put("password", credentials.get("password"));
-        response.put("timestamp", LocalDateTime.now());
-        return response;
+    public User login(@RequestBody User user) throws Exception {
+        if (user.getLogin() == null || user.getPassword() == null) {
+            throw new Exception("Missing login or password");
+        }
+
+        user.setTimeNow(LocalDateTime.now());
+        return user;
     }
 }
